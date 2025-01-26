@@ -43,26 +43,25 @@ pipeline {
 
         stage('Dockerize & Deploy') {
             steps {
-                script {
-                    echo "Building Docker image..."
-                    sh """
-                    docker build -t ${DOCKER_IMAGE} .
-                    """
-                    
-                    echo "Stopping and removing old container (if exists)..."
-                    sh """
-                    docker rm -f petclinic-app || true
-                    """
-                    
-                    echo "Deploying application with Docker..."
-                    sh """
-                    docker run -d --name petclinic-app -p 8081:8080 ${DOCKER_IMAGE}
-                    """
-                }
+                echo "Building Docker image..."
+                sh """
+                docker build -t ${DOCKER_IMAGE} .
+                """
+                
+                echo "Stopping and removing old container (if exists)..."
+                sh """
+                docker rm -f petclinic-app || true
+                """
+                
+                echo "Deploying application with Docker..."
+                sh """
+                docker run -d --name petclinic-app -p 8081:8080 ${DOCKER_IMAGE}
+                """
             }
-            // Ensure this stage always runs, even if tests fail
-            always {
-                echo "Dockerize & Deploy stage completed."
+            post {
+                always {
+                    echo "Dockerize & Deploy stage completed."
+                }
             }
         }
     }
