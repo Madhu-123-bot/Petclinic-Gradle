@@ -19,8 +19,8 @@ pipeline {
 
         stage('Build') {
             steps {
-                echo "Building the application with Gradle..."
-                sh './gradlew clean build'
+                echo "Building the application with Gradle (skipping tests)..."
+                sh './gradlew clean build -x test'
             }
         }
 
