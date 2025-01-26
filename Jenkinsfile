@@ -28,11 +28,11 @@ pipeline {
             steps {
                 echo "Running tests..."
                 script {
-                    // Running tests but catching test failures to not stop pipeline
+                    // Running tests but catching failures so that pipeline doesn't stop
                     def testResult = sh(script: './gradlew test', returnStatus: true)
                     if (testResult != 0) {
-                        echo "Some tests failed. Proceeding with pipeline."
-                        currentBuild.result = 'SUCCESS'  // Force pipeline to continue even if tests fail
+                        echo "Tests failed, but proceeding with pipeline"
+                        currentBuild.result = 'SUCCESS'  // Proceed even if tests fail
                     } else {
                         echo "Tests passed successfully!"
                     }
@@ -40,11 +40,11 @@ pipeline {
             }
             post {
                 always {
-                    echo "Test results are logged."
-                    junit '**/build/test-classes/test/*.xml'  // Adjust based on your test report location
+                    echo "Test results have been logged."
+                    junit '**/build/test-classes/test/*.xml'  // Adjust the location for your test reports
                 }
                 failure {
-                    echo "Some tests failed. Please check the test results."
+                    echo "Tests failed, check results above."
                 }
             }
         }
@@ -68,7 +68,7 @@ pipeline {
             }
             post {
                 always {
-                    echo "Docker image built and application deployed."
+                    echo "Docker image built and the application is deployed."
                 }
             }
         }
@@ -76,10 +76,10 @@ pipeline {
 
     post {
         success {
-            echo "Pipeline executed successfully! Application deployed."
+            echo "Pipeline executed successfully! The application is deployed."
         }
         failure {
-            echo "Pipeline failed. Please check the logs for test failures or other errors."
+            echo "Pipeline failed. Please check logs for test failures or other errors."
         }
     }
 }
