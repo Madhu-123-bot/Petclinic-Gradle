@@ -5,6 +5,7 @@ pipeline {
         GRADLE_HOME = '/usr'
         JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
         DOCKER_IMAGE = 'spring-petclinic:latest'
+        CONTAINER_NAME = 'petclinic-app'
     }
 
     triggers {
@@ -37,17 +38,22 @@ pipeline {
 
                 echo "Stopping and removing old container (if exists)..."
                 sh """
-                docker rm -f petclinic-app || true
+                docker rm -f ${CONTAINER_NAME} || true
                 """
 
-                echo "Deploying the application..."
+                echo "Stopping and removing the old image (if exists)..."
                 sh """
-                docker run -d --name petclinic-app -p 8081:8080 ${DOCKER_IMAGE}
+                docker rmi ${DOCKER_IMAGE} || true
+                """
+
+                echo "Deploying the new application..."
+                sh """
+                docker run -d --name ${CONTAINER_NAME} -p 8081:8080 ${DOCKER_IMAGE}
                 """
             }
             post {
                 always {
-                    echo "Docker image built and application deployed."
+                    echo "Docker image built and new container deployed."
                 }
             }
         }
