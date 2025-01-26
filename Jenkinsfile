@@ -46,7 +46,7 @@ pipeline {
                     
                     echo "Deploying application with Docker..."
                     sh """
-                    docker run -d --name petclinic-app -p 8080:80 ${DOCKER_IMAGE}
+                    docker run -d --name petclinic-app -p 8081:8080 ${DOCKER_IMAGE}
                     """
                 }
             }
