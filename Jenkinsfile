@@ -31,22 +31,27 @@ pipeline {
 
         stage('Dockerize & Deploy') {
             steps {
-                echo "Building Docker image..."
+                echo "Stopping the existing container (if running)..."
                 sh """
-                docker build -t ${DOCKER_IMAGE} .
+                docker stop ${CONTAINER_NAME} || true
                 """
 
-                echo "Stopping and removing old container (if exists)..."
+                echo "Removing the old container (if exists)..."
                 sh """
                 docker rm -f ${CONTAINER_NAME} || true
                 """
 
-                echo "Stopping and removing the old image (if exists)..."
+                echo "Removing the old image (if exists)..."
                 sh """
                 docker rmi ${DOCKER_IMAGE} || true
                 """
 
-                echo "Deploying the new application..."
+                echo "Building the new Docker image..."
+                sh """
+                docker build -t ${DOCKER_IMAGE} .
+                """
+
+                echo "Running the new container..."
                 sh """
                 docker run -d --name ${CONTAINER_NAME} -p 8081:8080 ${DOCKER_IMAGE}
                 """
