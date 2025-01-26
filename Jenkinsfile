@@ -27,7 +27,14 @@ pipeline {
         stage('Test') {
             steps {
                 echo "Running tests..."
-                sh './gradlew test'
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh './gradlew test'
+                }
+            }
+            post {
+                always {
+                    junit '**/build/test-classes/test/*.xml'  // Adjust according to your test report location
+                }
             }
         }
 
@@ -58,7 +65,7 @@ pipeline {
             echo "Pipeline executed successfully! Application deployed."
         }
         failure {
-            echo "Pipeline failed! Please check the logs."
+            echo "Pipeline failed! Please check the logs for test failures."
         }
     }
 }
