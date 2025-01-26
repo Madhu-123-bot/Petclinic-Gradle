@@ -11,7 +11,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo "Checking out code from GitHub..."
-                git url: 'https://github.com/Madhu-123-bot/Petclinic-Gradle.git', 
+                git url: 'https://github.com/Madhu-123-bot/Petclinic-Gradle.git',
                     branch: 'main', 
                     credentialsId: 'github-credentials'  // Replace with your Jenkins credential ID
             }
@@ -27,12 +27,19 @@ pipeline {
         stage('Test') {
             steps {
                 echo "Running tests..."
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh './gradlew test'
+                script {
+                    try {
+                        // Run tests and exit on failure if required
+                        sh './gradlew test'
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'  // Mark build as failure explicitly
+                        throw e  // Re-throw the exception to stop pipeline
+                    }
                 }
             }
             post {
                 always {
+                    echo "Test results..."
                     junit '**/build/test-classes/test/*.xml'  // Adjust according to your test report location
                 }
                 failure {
@@ -42,6 +49,9 @@ pipeline {
         }
 
         stage('Dockerize & Deploy') {
+            when {
+                expression { return currentBuild.result != 'FAILURE' }  // Only proceed if tests pass
+            }
             steps {
                 echo "Building Docker image..."
                 sh """
