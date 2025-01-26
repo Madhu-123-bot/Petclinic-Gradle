@@ -28,23 +28,23 @@ pipeline {
             steps {
                 echo "Running tests..."
                 script {
-                    // Running tests but catching failures so that pipeline doesn't stop
-                    def testResult = sh(script: './gradlew test', returnStatus: true)
-                    if (testResult != 0) {
-                        echo "Tests failed, but proceeding with pipeline"
-                        currentBuild.result = 'SUCCESS'  // Proceed even if tests fail
-                    } else {
-                        echo "Tests passed successfully!"
+                    catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                        def testResult = sh(script: './gradlew test', returnStatus: true)
+                        if (testResult != 0) {
+                            echo "Tests failed, but continuing with the pipeline."
+                        } else {
+                            echo "Tests passed!"
+                        }
                     }
                 }
             }
             post {
                 always {
                     echo "Test results have been logged."
-                    junit '**/build/test-classes/test/*.xml'  // Adjust the location for your test reports
+                    junit '**/build/test-classes/test/*.xml'  // Adjust path to your test reports
                 }
                 failure {
-                    echo "Tests failed, check results above."
+                    echo "Tests failed. Please check the test results."
                 }
             }
         }
@@ -60,7 +60,7 @@ pipeline {
                 sh """
                 docker rm -f petclinic-app || true
                 """
-                
+
                 echo "Deploying the application..."
                 sh """
                 docker run -d --name petclinic-app -p 8081:8080 ${DOCKER_IMAGE}
@@ -68,7 +68,7 @@ pipeline {
             }
             post {
                 always {
-                    echo "Docker image built and the application is deployed."
+                    echo "Docker image built and application deployed."
                 }
             }
         }
@@ -79,7 +79,7 @@ pipeline {
             echo "Pipeline executed successfully! The application is deployed."
         }
         failure {
-            echo "Pipeline failed. Please check logs for test failures or other errors."
+            echo "Pipeline failed. Please check the logs for errors."
         }
     }
 }
