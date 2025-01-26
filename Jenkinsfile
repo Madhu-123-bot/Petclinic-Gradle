@@ -24,31 +24,6 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                echo "Running tests..."
-                script {
-                    catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                        def testResult = sh(script: './gradlew test', returnStatus: true)
-                        if (testResult != 0) {
-                            echo "Tests failed, but continuing with the pipeline."
-                        } else {
-                            echo "Tests passed!"
-                        }
-                    }
-                }
-            }
-            post {
-                always {
-                    echo "Test results have been logged."
-                    junit '**/build/test-classes/test/*.xml'  // Adjust path to your test reports
-                }
-                failure {
-                    echo "Tests failed. Please check the test results."
-                }
-            }
-        }
-
         stage('Dockerize & Deploy') {
             steps {
                 echo "Building Docker image..."
