@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        MAVEN_HOME = '/usr/share/maven'  // Adjust according to your Maven installation path
+        GRADLE_HOME = '/usr'  // Update according to your installation path for Gradle
+        JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'  // Set Java Home path correctly
         DOCKER_IMAGE = 'spring-petclinic:latest'  // Update as per your Docker image name
     }
 
@@ -10,7 +11,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo "Checking out code from GitHub..."
-                git url: 'https://github.com/Madhu-123-bot/Petclinic-Gradle.git', 
+                git url: 'https://github.com/Madhu-123-bot/Petclinic-Gradle.git',
                     branch: 'main', 
                     credentialsId: 'github-credentials'  // Replace with your Jenkins credential ID
             }
@@ -18,17 +19,17 @@ pipeline {
 
         stage('Build') {
             steps {
-                echo "Building the application with Maven..."
-                sh 'mvn clean package -DskipTests'  // Build without running tests (you can remove '-DskipTests' if you want to run tests during build)
+                echo "Building the application with Gradle..."
+                sh './gradlew clean build'
             }
         }
 
         stage('Test') {
             steps {
-                echo "Running tests with Maven..."
+                echo "Running tests..."
                 script {
                     catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                        def testResult = sh(script: 'mvn test', returnStatus: true)
+                        def testResult = sh(script: './gradlew test', returnStatus: true)
                         if (testResult != 0) {
                             echo "Tests failed, but continuing with the pipeline."
                         } else {
@@ -40,7 +41,7 @@ pipeline {
             post {
                 always {
                     echo "Test results have been logged."
-                    junit '**/target/test-classes/test/*.xml'  // Adjust this path if needed, based on your Maven project structure
+                    junit '**/build/test-classes/test/*.xml'  // Adjust path to your test reports
                 }
                 failure {
                     echo "Tests failed. Please check the test results."
