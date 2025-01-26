@@ -35,6 +35,9 @@ pipeline {
                 always {
                     junit '**/build/test-classes/test/*.xml'  // Adjust according to your test report location
                 }
+                failure {
+                    echo "Tests failed. Please check the test results for details."
+                }
             }
         }
 
@@ -57,6 +60,10 @@ pipeline {
                     """
                 }
             }
+            // Ensure this stage always runs, even if tests fail
+            always {
+                echo "Dockerize & Deploy stage completed."
+            }
         }
     }
 
@@ -65,7 +72,7 @@ pipeline {
             echo "Pipeline executed successfully! Application deployed."
         }
         failure {
-            echo "Pipeline failed! Please check the logs for test failures."
+            echo "Pipeline failed! Please check the logs for details."
         }
     }
 }
