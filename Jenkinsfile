@@ -11,7 +11,9 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo "Checking out code from GitHub..."
-                git url: 'https://github.com/Madhu-123-bot/spring-petclinic-new.git', branch: 'main'
+                git url: 'https://github.com/Madhu-123-bot/spring-petclinic-new.git', 
+                    branch: 'main', 
+                    credentialsId: 'github-credentials'  // Replace with your Jenkins credential ID
             }
         }
 
