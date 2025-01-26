@@ -2,9 +2,13 @@ pipeline {
     agent any
 
     environment {
-        GRADLE_HOME = '/usr'  // Update according to your installation path for Gradle
-        JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'  // Set Java Home path correctly
-        DOCKER_IMAGE = 'spring-petclinic:latest'  // Update as per your Docker image name
+        GRADLE_HOME = '/usr'
+        JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
+        DOCKER_IMAGE = 'spring-petclinic:latest'
+    }
+
+    triggers {
+        githubPush()
     }
 
     stages {
@@ -13,7 +17,7 @@ pipeline {
                 echo "Checking out code from GitHub..."
                 git url: 'https://github.com/Madhu-123-bot/Petclinic-Gradle.git',
                     branch: 'main', 
-                    credentialsId: 'github-credentials'  // Replace with your Jenkins credential ID
+                    credentialsId: 'github-credentials'
             }
         }
 
