@@ -28,17 +28,18 @@ pipeline {
             steps {
                 echo "Running tests..."
                 script {
-                    // Allow tests to fail, but the pipeline should continue
-                    try {
-                        sh './gradlew test'
-                    } catch (Exception e) {
+                    // Running tests but not letting them fail the pipeline
+                    def testResult = sh(script: './gradlew test', returnStatus: true)
+                    if (testResult != 0) {
                         echo "Tests failed, but continuing the pipeline."
+                    } else {
+                        echo "Tests passed successfully!"
                     }
                 }
             }
             post {
                 always {
-                    echo "Test results..."
+                    echo "Test results are logged."
                     junit '**/build/test-classes/test/*.xml'  // Adjust according to your test report location
                 }
                 failure {
